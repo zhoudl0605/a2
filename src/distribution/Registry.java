@@ -36,7 +36,7 @@ public class Registry implements IRegistry {
 
         // start UDP discovery server
         udpServer = new UDPServer(this);
-        addPort(getPort());
+        // addPort(getPort());
         udpServer.start();
         udpServer.sendMsg("ADD_REGISTRY " + getPort());
         initialized = true;
@@ -60,6 +60,9 @@ public class Registry implements IRegistry {
             }
             newPorts[this.ports.length] = port;
             this.ports = newPorts;
+
+            Repository repository = Repository.getInstance();
+            repository.setRepositoryMap(getRepositoryMap());
         }
     }
 
@@ -68,7 +71,7 @@ public class Registry implements IRegistry {
     }
 
     public void register(String id) throws RemoteException {
-        IRepository repository = new Repository(this);
+        IRepository repository = new Repository();
 
         IRepository stub = (IRepository) UnicastRemoteObject.exportObject(repository, 0);
 
@@ -263,7 +266,12 @@ public class Registry implements IRegistry {
             for (int i = 0; i < ports.length; i++) {
                 java.rmi.registry.Registry localRegistry;
                 localRegistry = LocateRegistry.getRegistry(ports[i]);
-                String id = localRegistry.list()[0];
+                String[] list = localRegistry.list();
+
+                if (list == null || list.length == 0) {
+                    continue;
+                }
+                String id = list[0];
                 IRepository repository = Helper.connect(ports[i], Integer.parseInt(id));
                 repositoryMap.put(String.valueOf(id), repository);
             }

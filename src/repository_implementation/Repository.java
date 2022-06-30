@@ -7,7 +7,6 @@ import java.util.Map;
 import core.IAggregate;
 import core.IDistributedRepository;
 import core.IRepository;
-import distribution.Registry;
 import server.Directory;
 
 public class Repository implements IDistributedRepository {
@@ -17,18 +16,19 @@ public class Repository implements IDistributedRepository {
 
     public static Repository getInstance() {
         if (instance == null) {
-            instance = new Repository(null);
+            instance = new Repository();
         }
         return instance;
     }
 
-    public Repository(Registry registry) {
+    public Repository() {
         directory = new Directory();
-        if (registry != null) {
-            this.repositoryMap = registry.getRepositoryMap();
-        }
 
         Repository.instance = this;
+    }
+
+    public void setRepositoryMap(Map<String, IRepository> repositoryMap) {
+        this.repositoryMap = repositoryMap;
     }
 
     public String request(String request) {

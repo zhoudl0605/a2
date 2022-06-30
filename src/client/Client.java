@@ -15,22 +15,27 @@ public class Client {
 
     public static void main(String[] args) throws Exception {
         int[] ports = discoveryRepository();
+        String DEFAULT_ID = "1";
 
         // check size of ports
         if (ports == null || ports.length == 0) {
             return;
         }
 
-        IRepository[] repositories = new IRepository[ports.length];
+        // use input id to find repository
+        IRepository default_repository = null;
         for (int i = 0; i < ports.length; i++) {
             java.rmi.registry.Registry localRegistry;
             localRegistry = LocateRegistry.getRegistry(ports[i]);
             String id = localRegistry.list()[0];
-            repositories[i] = Helper.connect(ports[i], Integer.parseInt(id));
+            if (id.equals(DEFAULT_ID)) {
+                default_repository = Helper.connect(ports[i], Integer.parseInt(id));
+            }
         }
 
-        repositories[0].add("a", 1);
-        String result = repositories[0].getValue("a");
+        IRepository repository = default_repository.find("2");
+        repository.add("b", 123);
+        String r2_b = repository.getValue("b");
 
         int a = 1;
 
