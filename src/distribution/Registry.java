@@ -8,8 +8,10 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 import java.util.Map;
 
+import core.Helper;
 import core.IRegistry;
 import core.IRepository;
 import distribution.UDP.UDPClient;
@@ -66,7 +68,7 @@ public class Registry implements IRegistry {
     }
 
     public void register(String id) throws RemoteException {
-        IRepository repository = new Repository();
+        IRepository repository = new Repository(this);
 
         IRepository stub = (IRepository) UnicastRemoteObject.exportObject(repository, 0);
 
@@ -248,5 +250,28 @@ public class Registry implements IRegistry {
 
     public int[] getPorts() {
         return ports;
+    }
+
+    public Map<String, IRepository> getRepositoryMap() {
+        Map<String, IRepository> repositoryMap = new HashMap<>();
+        int[] ports = getPorts();
+        try {
+            if (ports == null || ports.length == 0) {
+                return repositoryMap;
+            }
+
+            for (int i = 0; i < ports.length; i++) {
+                java.rmi.registry.Registry localRegistry;
+                localRegistry = LocateRegistry.getRegistry(ports[i]);
+                String id = localRegistry.list()[0];
+                IRepository repository = Helper.connect(ports[i], Integer.parseInt(id));
+                repositoryMap.put(String.valueOf(id), repository);
+            }
+        } catch (RemoteException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return repositoryMap;
     }
 }

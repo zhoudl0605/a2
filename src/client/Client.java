@@ -25,8 +25,8 @@ public class Client {
         for (int i = 0; i < ports.length; i++) {
             java.rmi.registry.Registry localRegistry;
             localRegistry = LocateRegistry.getRegistry(ports[i]);
-            String rmi = localRegistry.list()[0];
-            repositories[i] = Helper.connect(ports[i], Integer.parseInt(rmi));
+            String id = localRegistry.list()[0];
+            repositories[i] = Helper.connect(ports[i], Integer.parseInt(id));
         }
 
         repositories[0].add("a", 1);

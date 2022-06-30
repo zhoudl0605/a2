@@ -7,22 +7,26 @@ import java.util.Map;
 import core.IAggregate;
 import core.IDistributedRepository;
 import core.IRepository;
+import distribution.Registry;
 import server.Directory;
 
 public class Repository implements IDistributedRepository {
     private static Repository instance = null;
     private Directory directory;
-    private Map<String, IRepository> repositories;
+    private Map<String, IRepository> repositoryMap;
 
     public static Repository getInstance() {
         if (instance == null) {
-            instance = new Repository();
+            instance = new Repository(null);
         }
         return instance;
     }
 
-    public Repository() {
+    public Repository(Registry registry) {
         directory = new Directory();
+        if (registry != null) {
+            this.repositoryMap = registry.getRepositoryMap();
+        }
 
         Repository.instance = this;
     }
@@ -89,7 +93,7 @@ public class Repository implements IDistributedRepository {
     @Override
     public IRepository find(String id) throws RemoteException {
         // find the repository with the given id
-        return repositories.get(id);
+        return repositoryMap.get(id);
     }
 
     @Override
