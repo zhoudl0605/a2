@@ -20,7 +20,8 @@ public class Directory {
 
     public boolean set(String key, ArrayList<Integer> new_vals) {
         List<Integer> vals = directory.get(key);
-        if (vals == null) return false;
+        if (vals == null)
+            return false;
         else {
             directory.put(key, new_vals);
             return true;
@@ -34,7 +35,7 @@ public class Directory {
             return "EMPTY-DIRECTORY";
         } else {
             boolean first = true;
-            for (String k:ks) {
+            for (String k : ks) {
                 if (!first) {
                     keys += "," + k;
                 } else {
@@ -57,13 +58,14 @@ public class Directory {
     public String getValue(String key) {
         List<Integer> arr = directory.get(key);
         if (arr != null) {
-            if (arr.size() > 0)  return "OK " + arr.get(0).toString();
-            else return "EMPTY";
+            if (arr.size() > 0)
+                return "OK " + arr.get(0).toString();
+            else
+                return "EMPTY";
         } else {
             return "UNKNOWN KEY";
         }
     }
-
 
     public String getValues(String key) {
         List<Integer> arr = directory.get(key);
@@ -71,17 +73,17 @@ public class Directory {
             if (arr.size() > 0) {
                 String str = "";
                 boolean first = true;
-                for (Integer i:arr) {
+                for (Integer i : arr) {
                     if (first) {
                         str += i.toString();
                         first = false;
                     } else {
-                        str += ","+i.toString();
+                        str += "," + i.toString();
                     }
                 }
                 return "OK " + str;
-            }
-            else return "EMPTY";
+            } else
+                return "EMPTY";
         } else {
             return "UNKNOWN KEY";
         }
@@ -94,7 +96,7 @@ public class Directory {
         }
         Integer min = 0;
         boolean first = true;
-        for (int i: vals) {
+        for (int i : vals) {
             if (first) {
                 min = i;
                 first = false;
@@ -112,7 +114,7 @@ public class Directory {
         }
         Integer max = 0;
         boolean first = true;
-        for (int i: vals) {
+        for (int i : vals) {
             if (first) {
                 max = i;
                 first = false;
@@ -123,16 +125,16 @@ public class Directory {
         return "OK " + max;
     }
 
-    public String sum(String key) {
+    public int sum(String key) {
         List<Integer> vals = directory.get(key);
         if (vals == null) {
-            return "UNKOWN KEY";
+            return 0;
         }
         Integer sum = 0;
-        for (int i: vals) {
+        for (int i : vals) {
             sum += i;
         }
-        return "OK " + sum;
+        return sum;
     }
 
     public void reset() {

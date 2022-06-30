@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.URI;
-import java.util.Map;
-
 import distribution.Registry;
 
 public class UDPServer implements Runnable {
@@ -53,15 +50,18 @@ public class UDPServer implements Runnable {
                     }
 
                     String reply = "";
-                    String[] list = null;
                     switch (command) {
                         case "DISCOVERY":
                             System.out.println("received DISCOVERY from " + dPacket.getAddress().getHostAddress());
                             // send back the registry information
-                            reply = "REGISTRY " + registry.getPort();
-                            list = this.registry.list();
-                            if (list == null) {
+                            reply = "REGISTRY";
+                            int[] potrs = this.registry.getPorts();
+                            if (potrs == null) {
                                 break;
+                            }
+
+                            for (int i = 0; i < potrs.length; i++) {
+                                reply += " " + potrs[i];
                             }
 
                             sendMsg(reply);
@@ -85,10 +85,6 @@ public class UDPServer implements Runnable {
         }
     }
 
-    private boolean isExistRepositoryPeer(String id) {
-        return registry.getRepositoryServicesMap().containsKey(id);
-    }
-
     public void start() {
         udpThread = new Thread(this);
         udpThread.start();
@@ -109,9 +105,5 @@ public class UDPServer implements Runnable {
     public void close() {
         sendMsg("LEAVE " + registry.getRegistryURI());
         receiveDSocket.close();
-    }
-
-    public Boolean isExistRegistryPeer(URI uri) {
-        return registry.isRepositoryPeerExist(uri);
     }
 }

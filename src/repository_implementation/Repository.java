@@ -66,8 +66,6 @@ public class Repository implements IDistributedRepository {
             case "get":
                 return directory.getValue(key);
 
-            case "sum":
-                return directory.sum(key);
         }
 
         return "ERROR: Invalid request";
@@ -78,21 +76,44 @@ public class Repository implements IDistributedRepository {
     }
 
     @Override
-    public IAggregate aggregate(String[] repids) {
+    public IAggregate aggregate(String[] repids) throws RemoteException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public int sum(String key) {
-        // TODO Auto-generated method stub
-        return 0;
+    public int sum(String key) throws RemoteException {
+        return directory.sum(key);
     }
 
     @Override
-    public IRepository find(String id) {
+    public IRepository find(String id) throws RemoteException {
         // find the repository with the given id
         return repositories.get(id);
     }
 
+    @Override
+    public String list() throws RemoteException {
+        return directory.list();
+    }
+
+    @Override
+    public void delete(String key) throws RemoteException {
+        directory.delete(key);
+    }
+
+    @Override
+    public void add(String key, Integer val) throws RemoteException {
+        directory.add(key, val);
+    }
+
+    @Override
+    public String getValue(String key) throws RemoteException {
+        return directory.getValue(key);
+    }
+
+    @Override
+    public void set(String key, ArrayList<Integer> val) throws RemoteException {
+        directory.set(key, val);
+    }
 }

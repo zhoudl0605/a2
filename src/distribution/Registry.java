@@ -8,7 +8,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
 import java.util.Map;
 
 import core.IRegistry;
@@ -35,6 +34,7 @@ public class Registry implements IRegistry {
 
         // start UDP discovery server
         udpServer = new UDPServer(this);
+        addPort(getPort());
         udpServer.start();
         udpServer.sendMsg("ADD_REGISTRY " + getPort());
         initialized = true;
@@ -51,6 +51,9 @@ public class Registry implements IRegistry {
         } else {
             int[] newPorts = new int[this.ports.length + 1];
             for (int i = 0; i < this.ports.length; i++) {
+                if (this.ports[i] == port) {
+                    return;
+                }
                 newPorts[i] = this.ports[i];
             }
             newPorts[this.ports.length] = port;
@@ -62,7 +65,7 @@ public class Registry implements IRegistry {
         udpServer.close();
     }
 
-    public void register(String id, URI uri) throws RemoteException {
+    public void register(String id) throws RemoteException {
         IRepository repository = new Repository();
 
         IRepository stub = (IRepository) UnicastRemoteObject.exportObject(repository, 0);
@@ -80,7 +83,7 @@ public class Registry implements IRegistry {
 
     @Override
     public String[] list() {
-        String[] list = null;
+        String[] list = new String[0];
 
         if (this.ports == null) {
             return list;
@@ -89,15 +92,16 @@ public class Registry implements IRegistry {
         try {
             for (int port : this.ports) {
                 java.rmi.registry.Registry registry = LocateRegistry.getRegistry(port);
-                if (list == null) {
-                    list = registry.list();
+                String[] registryList = registry.list();
+                if (registryList == null) {
+                    continue;
                 } else {
-                    String[] newList = new String[list.length + registry.list().length];
+                    String[] newList = new String[list.length + registryList.length];
                     for (int i = 0; i < list.length; i++) {
                         newList[i] = list[i];
                     }
                     for (int i = list.length; i < newList.length; i++) {
-                        newList[i] = registry.list()[i - list.length];
+                        newList[i] = registryList[i - list.length];
                     }
                     list = newList;
                 }
@@ -240,5 +244,9 @@ public class Registry implements IRegistry {
 
     public Boolean isRepositoryServiceExist(String id) {
         return repositoryServicesMap.containsKey(id);
+    }
+
+    public int[] getPorts() {
+        return ports;
     }
 }
